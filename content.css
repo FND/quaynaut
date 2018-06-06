@@ -1,0 +1,29 @@
+body {
+	font-family: sans-serif;
+}
+
+.quaynaut article {
+	padding: 1em;
+	font-size: 4vh;
+}
+
+.quaynaut h1,
+.quaynaut h2,
+.quaynaut p,
+.quaynaut ul,
+.quaynaut li {
+	margin: 0 0 0.5em;
+}
+
+.quaynaut h1 {
+	margin-bottom: 1em;
+}
+
+/* slide layouts */
+
+.quaynaut article.title {
+	display: flex;
+	text-align: center;
+	flex-direction: column;
+	justify-content: center;
+}
