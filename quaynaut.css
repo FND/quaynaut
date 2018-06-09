@@ -12,8 +12,12 @@ body.quaynaut {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+	border: 4px solid #808080;
 }
 
+.quaynaut.presentation article {
+	border: none;
+}
 .quaynaut.presentation article:not(:target) {
 	position: absolute;
 	top: -300vh;
@@ -29,6 +33,7 @@ body.quaynaut {
 	position: absolute;
 	top: 1em;
 	right: 1em;
+	text-decoration: none;
 }
 
 .quaynaut-nav {
@@ -40,6 +45,8 @@ body.quaynaut {
 .quaynaut-nav a {
 	overflow: hidden;
 	font-size: 0;
+	text-decoration: none;
+	color: #808080;
 }
 .quaynaut-nav a:after {
 	font-size: 2rem;
