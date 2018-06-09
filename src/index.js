@@ -1,3 +1,4 @@
+import Prism from "./prism_shim";
 import renderMarkdown from "./markdown";
 import { find, html2dom as html } from "./util";
 
@@ -6,7 +7,7 @@ let SLIDE_TAG = "article";
 let NAV_CLASS = "quaynaut-nav";
 let TOGGLE_CLASS = "quaynaut-toggle";
 
-init();
+document.addEventListener("DOMContentLoaded", init);
 
 document.addEventListener("keydown", ev => {
 	switch(ev.keyCode) {
@@ -61,6 +62,9 @@ function init() {
 
 		// render Markdown
 		find("pre[data-markdown]", slide).forEach(renderMarkdown);
+
+		// syntax highlighting
+		Prism.highlightAll();
 	});
 }
 

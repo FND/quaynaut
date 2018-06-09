@@ -19,7 +19,8 @@
 		"compile": "faucet --compact"
 	},
 	"dependencies": {
-		"commonmark": "^0.28.1"
+		"commonmark": "^0.28.1",
+		"prismjs": "^1.14.0"
 	},
 	"devDependencies": {
 		"eslint-config-fnd": "^1.4.0",
