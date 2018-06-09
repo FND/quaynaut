@@ -18,7 +18,9 @@
 		"test": "eslint --cache *.js src && echo ✓",
 		"compile": "faucet --compact"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"commonmark": "^0.28.1"
+	},
 	"devDependencies": {
 		"eslint-config-fnd": "^1.4.0",
 		"faucet-pipeline-js": "~1.0.0-rc.6"

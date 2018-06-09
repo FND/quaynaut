@@ -1,3 +1,4 @@
+import renderMarkdown from "./markdown";
 import { find, html2dom as html } from "./util";
 
 let ROOT_SELECTOR = ".quaynaut";
@@ -57,6 +58,9 @@ function init() {
 			`<a rel="next" href="#s${id + 1}">next</a>`}
 </nav>
 		`);
+
+		// render Markdown
+		find("pre[data-markdown]", slide).forEach(renderMarkdown);
 	});
 }
 
