@@ -1,0 +1,26 @@
+{
+	"name": "quaynaut",
+	"version": "0.0.1",
+	"description": "simplistic web presentations",
+	"author": "FND",
+	"license": "Apache-2.0",
+	"homepage": "https://github.com/FND/quaynaut",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/FND/quaynaut.git"
+	},
+	"bugs": {
+		"url": "https://github.com/FND/quaynaut/issues"
+	},
+	"main": "src/index.js",
+	"scripts": {
+		"start": "npm run compile -- --watch",
+		"test": "eslint --cache *.js src && echo ✓",
+		"compile": "faucet --compact"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"eslint-config-fnd": "^1.4.0",
+		"faucet-pipeline-js": "~1.0.0-rc.6"
+	}
+}
