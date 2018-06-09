@@ -4,6 +4,15 @@ body.quaynaut {
 	padding: 0;
 	counter-reset: slides;
 }
+body.quaynaut.ratio4-3 {
+	height: calc(100vw * 3 / 4);
+}
+body.quaynaut.ratio16-9 {
+	height: calc(100vw * 9 / 16);
+}
+body.quaynaut.ratio16-10 {
+	height: calc(100vw * 10 / 16);
+}
 
 .quaynaut article {
 	counter-increment: slides;
