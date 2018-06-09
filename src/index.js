@@ -7,6 +7,20 @@ let TOGGLE_CLASS = "quaynaut-toggle";
 
 init();
 
+document.addEventListener("keydown", ev => {
+	switch(ev.keyCode) {
+	case 37: // left
+		cycle("prev");
+		break;
+	case 39: // right
+		cycle("next");
+		break;
+	case 80: // p
+		togglePresentationMode();
+		break;
+	}
+});
+
 function init() {
 	let root = document.querySelector(ROOT_SELECTOR);
 	if(!root) {
@@ -58,4 +72,22 @@ function togglePresentationMode() {
 
 	// ensure the correct slide is displayed
 	document.location = document.location.toString();
+}
+
+// `direction` is either `"prev"` or `"next"`
+function cycle(direction) {
+	let slideSelector = `${ROOT_SELECTOR} ${SLIDE_TAG}`; // XXX: breaks encapsulation
+	let currentSlide = document.querySelector(":target") ||
+			document.querySelector(slideSelector);
+
+	let link = currentSlide.querySelector(`.${NAV_CLASS} a[rel=${direction}]`);
+	let uri = link && link.href;
+
+	if(!uri) {
+		let slides = find(slideSelector);
+		let i = direction === "prev" ? slides.length - 1 : 0;
+		uri = `#${slides[i].id}`;
+	}
+
+	document.location = uri;
 }
