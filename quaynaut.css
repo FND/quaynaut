@@ -26,7 +26,6 @@ body.quaynaut {
 }
 .quaynaut-nav a:after {
 	font-size: 2rem;
-	margin-left: 0.5em;
 }
 .quaynaut-nav a[rel=prev]:after {
 	content: "←";

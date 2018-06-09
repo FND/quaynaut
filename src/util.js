@@ -3,13 +3,16 @@ export function find(selector, root = document) {
 	return [].slice.call(nodes); // XXX: not necessary for modern browsers
 }
 
-export function createElement(tag, attribs, text) {
-	let node = document.createElement(tag);
-	Object.keys(attribs).forEach(attr => {
-		node.setAttribute(attr, attribs[attr]);
-	});
-	if(text) {
-		node.textContent = text;
-	}
-	return node;
+// NB: discards blank values (`undefined`, `null`, `false`) to allow for
+//     conditionals with boolean operators (`condition && value`)
+export function html2dom(parts, ...values) {
+	let html = parts.reduce((memo, part, i) => {
+		let val = values[i];
+		let blank = val === undefined || val === null || val === false;
+		return memo.concat(blank ? [part] : [part, val]);
+	}, []).join("");
+
+	let tmp = document.createElement("div");
+	tmp.innerHTML = html.trim();
+	return tmp.childNodes[0];
 }

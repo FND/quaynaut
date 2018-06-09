@@ -1,15 +1,19 @@
-import { find, createElement } from "./util";
+import { find, html2dom as html } from "./util";
 
-init(".quaynaut");
+let ROOT_SELECTOR = ".quaynaut";
+let SLIDE_TAG = "article";
+let NAV_CLASS = "quaynaut-nav";
 
-function init(root) {
-	root = document.querySelector(root);
+init();
+
+function init() {
+	let root = document.querySelector(ROOT_SELECTOR);
 	if(!root) {
 		console.warn("Querynaut could not be initialized due to missing root element");
 		return;
 	}
 
-	let slides = find("article", root);
+	let slides = find(SLIDE_TAG, root);
 	let penultimate = slides.length - 1;
 	slides.forEach((slide, i) => {
 		// generate ID -- TODO: account for existing attributes (incl. prev/next)
@@ -17,17 +21,14 @@ function init(root) {
 		slide.id = `s${id}`;
 
 		// generate navigation links
-		let nav = createElement("nav", { class: "quaynaut-nav" });
-		if(i !== 0) {
-			let link = createElement("a", { rel: "prev", href: `#s${id - 1}` }, "previous");
-			nav.appendChild(link);
-		}
-		let current = createElement("a", { rel: "self", href: `#s${id}` }, `slide ${id}`);
-		nav.appendChild(current);
-		if(i !== penultimate) {
-			let link = createElement("a", { rel: "next", href: `#s${id + 1}` }, "next");
-			nav.appendChild(link);
-		}
-		slide.appendChild(nav);
+		slide.appendChild(html`
+<nav class="${NAV_CLASS}">
+	${i !== 0 && // eslint-disable-next-line indent
+			`<a rel="prev" href="#s${id - 1}">previous</a>`}
+	<a rel="self" href="#s${id}">slide ${id}</a>
+	${i !== penultimate && // eslint-disable-next-line indent
+			`<a rel="next" href="#s${id + 1}">next</a>`}
+</nav>
+		`);
 	});
 }
