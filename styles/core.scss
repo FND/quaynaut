@@ -1,0 +1,73 @@
+body.quaynaut {
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	counter-reset: slides;
+
+	&.ratio4-3 {
+		height: calc(100vw * 3 / 4);
+	}
+	&.ratio16-9 {
+		height: calc(100vw * 9 / 16);
+	}
+	&.ratio16-10 {
+		height: calc(100vw * 10 / 16);
+	}
+
+	& article {
+		counter-increment: slides;
+		box-sizing: border-box;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		border: 4px solid #808080;
+	}
+
+	&.presentation article {
+		border: none;
+
+		&:not(:target) {
+			position: absolute;
+			top: -300vh;
+			left: -300vw;
+			width: 0;
+			height: 0;
+			overflow: hidden;
+			margin: 0;
+			padding: 0;
+		}
+	}
+}
+
+.quaynaut-toggle {
+	position: absolute;
+	top: 1em;
+	right: 1em;
+	text-decoration: none;
+}
+
+.quaynaut-nav {
+	position: absolute;
+	bottom: 1em;
+	right: 1em;
+
+	a {
+		overflow: hidden;
+		font-size: 0;
+		text-decoration: none;
+		color: #808080;
+	}
+	a:after {
+		font-size: 2rem;
+	}
+	a[rel=prev]:after {
+		content: "←";
+	}
+	a[rel=self]:after {
+		content: counter(slides);
+	}
+	a[rel=next]:after {
+		content: "→";
+	}
+}
