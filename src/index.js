@@ -3,6 +3,7 @@ import renderMarkdown from "./markdown";
 import { find, html2dom as html } from "./util";
 
 let ROOT_SELECTOR = ".quaynaut";
+let MARKDOWN_SELECTOR = "pre[data-markdown]";
 let SLIDE_TAG = "article";
 let NAV_CLASS = "quaynaut-nav";
 let TOGGLE_CLASS = "quaynaut-toggle";
@@ -29,6 +30,26 @@ function init() {
 		console.warn("Querynaut could not be initialized due to missing root element");
 		return;
 	}
+
+	// support for Markdown-only slide elements, for convenience
+	find(MARKDOWN_SELECTOR, root).forEach(md => {
+		if(md.closest(SLIDE_TAG)) { // XXX: inefficient
+			return;
+		}
+		// add slide wrapper to ensure consistent markup
+		let slide = document.createElement(SLIDE_TAG);
+		md.parentNode.insertBefore(slide, md);
+		slide.appendChild(md);
+		// transfer attributes
+		let attribs = [].slice.call(md.attributes);
+		attribs.forEach(({ name, value }) => {
+			if(name === "data-markdown") { // XXX: breaks encapsulation
+				return;
+			}
+			slide.setAttribute(name, value);
+			md.removeAttribute(name);
+		});
+	});
 
 	let toggle = html`<a class="${TOGGLE_CLASS}" href="#s1" data-alt="📽️">📃</a>`;
 	toggle.addEventListener("click", togglePresentationMode);
@@ -61,7 +82,7 @@ function init() {
 		`);
 
 		// render Markdown
-		find("pre[data-markdown]", slide).forEach(renderMarkdown);
+		find(MARKDOWN_SELECTOR, slide).forEach(renderMarkdown);
 
 		// syntax highlighting
 		Prism.highlightAll();
