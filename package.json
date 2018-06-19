@@ -20,7 +20,8 @@
 	},
 	"dependencies": {
 		"commonmark": "^0.28.1",
-		"prismjs": "^1.14.0"
+		"prismjs": "^1.14.0",
+		"uitil": "^2.3.0"
 	},
 	"devDependencies": {
 		"eslint-config-fnd": "^1.4.0",

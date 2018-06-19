@@ -1,6 +1,7 @@
 import Prism from "./prism_shim";
 import renderMarkdown from "./markdown";
-import { find, html2dom as html } from "./util";
+import { find } from "uitil/dom";
+import { html2dom as html } from "uitil/dom/create";
 
 let ROOT_SELECTOR = ".quaynaut";
 let MARKDOWN_SELECTOR = "pre[data-markdown]";
@@ -32,7 +33,7 @@ function init() {
 	}
 
 	// support for Markdown-only slide elements, for convenience
-	find(MARKDOWN_SELECTOR, root).forEach(md => {
+	find(root, MARKDOWN_SELECTOR).forEach(md => {
 		if(md.closest(SLIDE_TAG)) { // XXX: inefficient
 			return;
 		}
@@ -59,7 +60,7 @@ function init() {
 		document.location = `${document.location}#s1`;
 	}
 
-	let slides = find(SLIDE_TAG, root);
+	let slides = find(root, SLIDE_TAG);
 	let penultimate = slides.length - 1;
 	slides.forEach((slide, i) => {
 		if(i === 0) {
@@ -82,7 +83,7 @@ function init() {
 		`);
 
 		// render Markdown
-		find(MARKDOWN_SELECTOR, slide).forEach(renderMarkdown);
+		find(slide, MARKDOWN_SELECTOR).forEach(renderMarkdown);
 
 		// syntax highlighting
 		Prism.highlightAll();
@@ -113,7 +114,7 @@ function cycle(direction) {
 	let uri = link && link.href;
 
 	if(!uri) {
-		let slides = find(slideSelector);
+		let slides = find(document.body, slideSelector); // XXX: scope implies layout assumptions
 		let i = direction === "prev" ? slides.length - 1 : 0;
 		uri = `#${slides[i].id}`;
 	}
