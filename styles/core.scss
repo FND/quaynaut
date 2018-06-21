@@ -1,3 +1,10 @@
+// XXX: using `$height: $width` rather than the inverse to avoid duplicate keys
+$ratios: (
+	3: 4,
+	9: 16,
+	10: 16
+);
+
 html,
 body,
 quay-naut {
@@ -10,14 +17,23 @@ quay-naut {
 	display: block;
 	counter-reset: slides;
 
-	&.ratio4-3 {
-		height: calc(100vw * 3 / 4);
-	}
-	&.ratio16-9 {
-		height: calc(100vw * 9 / 16);
-	}
-	&.ratio16-10 {
-		height: calc(100vw * 10 / 16);
+	@each $height, $width in $ratios {
+		$ratio: $width / $height;
+
+		&.ratio#{$width}-#{$height} {
+			width: calc(100vh * #{$ratio});
+			margin: 0 auto;
+
+			// swap constraint if viewport is taller than wide (proportionally)
+			// FIXME: does not affect `vh` units (namely `font-size`)
+			@media screen and (max-width: #{100vh * $ratio}) {
+				& {
+					width: auto;
+					height: calc(100vw / #{$ratio});
+					margin-top: calc((100vh - 100vw / #{$ratio}) / 2); // center vertically
+				}
+			}
+		}
 	}
 
 	& article {
