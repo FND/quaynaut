@@ -59,17 +59,36 @@ export default class Quaynaut extends HTMLElement {
 			Prism.highlightAll();
 		});
 
+		this.onMessage = this.onMessage.bind(this);
 		this.onKeypress = this.onKeypress.bind(this);
+		window.addEventListener("message", this.onMessage);
 		document.addEventListener("keydown", this.onKeypress);
 		toggle.addEventListener("click", ev => this.togglePresentationMode(true));
 	}
 
 	disconnectedCallback() {
+		window.removeEventListener("message", this.onMessage);
 		document.removeEventListener("keydown", this.onKeypress);
 	}
 
 	onKeypress(ev) {
-		switch(ev.keyCode) {
+		let key = ev.keyCode;
+		let main = this.mainView;
+		if(main) { // speaker view acts as remote control for main view
+			// FIXME: when not using keyboard controls within speaker view, both
+			//        views might get out of sync - this could be fixed by
+			//        sending absolute slide IDs instead of relative commands
+			let cmd = { // XXX: DRY
+				37: "CYCLE:prev",
+				39: "CYCLE:next"
+			}[key];
+			if(!cmd) {
+				return;
+			}
+			main.postMessage(cmd, document.location.origin);
+		}
+
+		switch(key) {
 		case 37: // left
 			this.cycle("prev");
 			break;
@@ -78,6 +97,48 @@ export default class Quaynaut extends HTMLElement {
 			break;
 		case 80: // p
 			this.togglePresentationMode();
+			break;
+		case 83: // s
+			let loc = document.location;
+			let uri = loc.toString();
+			if(uri.indexOf("file://") === 0) {
+				alert("speaker view requires Quaynaut to be served via HTTP");
+				break;
+			}
+
+			let speakerView = window.open(uri);
+			speakerView.onload = () => {
+				// ensure URI targets a slide -- XXX: hacky
+				this.cycle("next");
+				this.cycle("prev");
+				speakerView.postMessage(`INIT:${loc.hash}`, loc.origin);
+			};
+			break;
+		}
+	}
+
+	onMessage(ev) {
+		if(ev.origin !== document.location.origin) { // ignore unsolicited messages
+			return;
+		}
+
+		let msg = ev.data;
+		if(msg.indexOf("INIT:") === 0) { // initialize speaker view
+			let uri = msg.substr(5);
+			if(uri.indexOf("#") !== 0) {
+				throw new Error(`unexpected initialization parameter: \`${msg}\``);
+			}
+			document.location.hash = uri;
+			this.classList.add("speaker-view");
+			this.mainView = ev.source;
+			return;
+		}
+		switch(msg) {
+		case "CYCLE:prev":
+			this.cycle("prev");
+			break;
+		case "CYCLE:next":
+			this.cycle("next");
 			break;
 		}
 	}
@@ -93,8 +154,9 @@ export default class Quaynaut extends HTMLElement {
 
 		// ensure the correct slide is displayed
 		if(!link) { // function doubles as link's event handler
-			let uri = document.location.toString();
-			document.location = uri.indexOf("#") === 0 ? uri : `#${this.idPrefix}1`;
+			// XXX: hacky
+			this.cycle("next");
+			this.cycle("prev");
 		}
 	}
 

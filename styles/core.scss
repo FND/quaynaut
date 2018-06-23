@@ -46,18 +46,27 @@ quay-naut {
 		border: 4px solid #808080;
 	}
 
-	&.presentation article {
+	&.presentation:not(.speaker-view) article {
 		border: none;
 
 		&:not(:target) {
 			position: absolute;
-			top: -300vh;
-			left: -300vw;
-			width: 0;
-			height: 0;
-			overflow: hidden;
-			margin: 0;
-			padding: 0;
+			transform: scale(0);
+		}
+	}
+
+	&.speaker-view article {
+		position: absolute;
+		transform: scale(0);
+
+		&:target,
+		&:target + article {
+			position: static;
+			transform: scale(0.6);
+			transform-origin: top left;
+		}
+		&:target + article {
+			transform: translate(60%, -90%) scale(0.4);
 		}
 	}
 }
