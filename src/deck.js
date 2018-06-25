@@ -8,7 +8,7 @@ export default class Quaynaut extends HTMLElement {
 	connectedCallback() {
 		let { markdownSelector, slideTag } = this;
 		let toggle = html`<a class="${this.toggleClass}"
-				href="#${this.idPrefix}1" data-alt="📽️">📃</a>`;
+				href="#${this.sid(1)}" data-alt="📽️">📃</a>`;
 
 		// transform Markdown-only slide elements
 		find(this, markdownSelector).forEach(md => {
@@ -39,16 +39,16 @@ export default class Quaynaut extends HTMLElement {
 
 			// generate ID -- TODO: account for existing IDs (incl. prev/next below)
 			let id = i + 1;
-			slide.id = this.idPrefix + id;
+			slide.id = this.sid(id);
 
 			// generate navigation links
 			slide.appendChild(html`
 <nav class="${this.navClass}">
 	${i !== 0 && // eslint-disable-next-line indent
-			`<a rel="prev" href="#${this.idPrefix}${id - 1}">previous</a>`}
-	<a rel="self" href="#${this.idPrefix}${id}">slide ${id}</a>
+			`<a rel="prev" href="#${this.sid(id - 1)}">previous</a>`}
+	<a rel="self" href="#${this.sid(id)}">slide ${id}</a>
 	${i !== penultimate && // eslint-disable-next-line indent
-			`<a rel="next" href="#${this.idPrefix}${id + 1}">next</a>`}
+			`<a rel="next" href="#${this.sid(id + 1)}">next</a>`}
 </nav>
 			`);
 
@@ -178,6 +178,10 @@ export default class Quaynaut extends HTMLElement {
 		document.location = uri || `#${id}`;
 	}
 
+	sid(index) { // NB: `index` is 1-based
+		return "s" + index;
+	}
+
 	get markdownSelector() {
 		return "pre[data-markdown]";
 	}
@@ -192,9 +196,5 @@ export default class Quaynaut extends HTMLElement {
 
 	get slideTag() {
 		return "article";
-	}
-
-	get idPrefix() {
-		return "s";
 	}
 }
