@@ -79,26 +79,42 @@ quay-naut {
 }
 
 .quaynaut-nav {
+	display: grid;
 	position: absolute;
 	bottom: 1em;
 	right: 1em;
+	grid-template-areas: "prev self next";
+	grid-template-columns: 1fr 1fr 1fr;
 
 	a {
 		overflow: hidden;
 		font-size: 0;
+		text-align: center;
 		text-decoration: none;
 		color: #808080;
 	}
 	a:after {
 		font-size: 2rem;
 	}
-	a[rel=prev]:after {
-		content: "←";
+	a[rel=prev] {
+		grid-area: prev;
+
+		&:after {
+			content: "←";
+		}
 	}
-	a[rel=self]:after {
-		content: counter(slides);
+	a[rel=self] {
+		grid-area: self;
+
+		&:after {
+			content: counter(slides);
+		}
 	}
-	a[rel=next]:after {
-		content: "→";
+	a[rel=next] {
+		grid-area: next;
+
+		&:after {
+			content: "→";
+		}
 	}
 }
