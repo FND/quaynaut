@@ -68,6 +68,11 @@ quay-naut {
 		&:target + article {
 			transform: translate(60%, -90%) scale(0.4);
 		}
+
+		.quaynaut-nav a[rel=prev],
+		.quaynaut-nav a[rel=next] {
+			display: none;
+		}
 	}
 }
 

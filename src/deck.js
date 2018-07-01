@@ -72,47 +72,18 @@ export default class Quaynaut extends HTMLElement {
 	}
 
 	onKeypress(ev) {
-		let key = ev.keyCode;
-		let main = this.mainView;
-		if(main) { // speaker view acts as remote control for main view
-			// FIXME: when not using keyboard controls within speaker view, both
-			//        views might get out of sync - this could be fixed by
-			//        sending absolute slide IDs instead of relative commands
-			let cmd = { // XXX: DRY
-				37: "CYCLE:prev",
-				39: "CYCLE:next"
-			}[key];
-			if(!cmd) {
-				return;
-			}
-			main.postMessage(cmd, document.location.origin);
-		}
-
-		switch(key) {
+		switch(ev.keyCode) {
 		case 37: // left
-			this.cycle("prev");
+			this.dispatch("CYCLE:prev");
 			break;
 		case 39: // right
-			this.cycle("next");
+			this.dispatch("CYCLE:next");
 			break;
 		case 80: // p
 			this.togglePresentationMode();
 			break;
 		case 83: // s
-			let loc = document.location;
-			let uri = loc.toString();
-			if(uri.indexOf("file://") === 0) {
-				alert("speaker view requires Quaynaut to be served via HTTP");
-				break;
-			}
-
-			let speakerView = window.open(uri);
-			speakerView.onload = () => {
-				// ensure URI targets a slide -- XXX: hacky
-				this.cycle("next");
-				this.cycle("prev");
-				speakerView.postMessage(`INIT:${loc.hash}`, loc.origin);
-			};
+			this.speakerView();
 			break;
 		}
 	}
@@ -131,16 +102,50 @@ export default class Quaynaut extends HTMLElement {
 			document.location.hash = uri;
 			this.classList.add("speaker-view");
 			this.mainView = ev.source;
-			return;
+		} else if(msg.indexOf("SELECT:") === 0) {
+			let id = msg.substr(7);
+			this.select(id);
 		}
-		switch(msg) {
+	}
+
+	dispatch(cmd) {
+		let select = direction => {
+			let id = this.cycle(direction);
+			return `SELECT:${id}`;
+		};
+		switch(cmd) {
 		case "CYCLE:prev":
-			this.cycle("prev");
+			cmd = select("prev");
 			break;
 		case "CYCLE:next":
-			this.cycle("next");
+			cmd = select("next");
 			break;
+		default: // unknown command
+			return;
 		}
+
+		let main = this.mainView;
+		if(main) { // speaker view acts as remote control for main view
+			main.postMessage(cmd, document.location.origin);
+		}
+	}
+
+	speakerView() {
+		let loc = document.location;
+		let uri = loc.toString();
+		if(uri.indexOf("file://") === 0) {
+			alert("speaker view requires Quaynaut to be served via HTTP");
+			return;
+		}
+
+		let win = window.open(uri);
+		win.onload = () => {
+			// ensure URI targets a slide -- XXX: hacky
+			this.cycle("next");
+			this.cycle("prev");
+
+			win.postMessage(`INIT:${loc.hash}`, loc.origin);
+		};
 	}
 
 	togglePresentationMode(link) {
@@ -160,22 +165,29 @@ export default class Quaynaut extends HTMLElement {
 		}
 	}
 
-	// `direction` is either `"prev"` or `"next"`
 	cycle(direction) {
-		let current = this.querySelector(":target") || this.querySelector(this.slideTag);
-		let link = current.querySelector(`.${this.navClass} a[rel=${direction}]`);
-		let uri = link && link.href;
-		if(uri) {
-			this.select(null, uri);
-		} else {
-			let slides = find(this, this.slideTag);
-			let i = direction === "prev" ? slides.length - 1 : 0;
-			this.select(slides[i].id);
-		}
+		let id = this.rel2abs(direction);
+		this.select(id);
+		return id;
 	}
 
-	select(id, uri) {
-		document.location = uri || `#${id}`;
+	// `direction` is either `"prev"` or `"next"`
+	rel2abs(direction) {
+		let current = this.querySelector(":target") || this.querySelector(this.slideTag);
+		let link = current.querySelector(`.${this.navClass} a[rel=${direction}]`);
+
+		let uri = link && link.hash;
+		if(uri) {
+			return uri.substr(1); // strip leading hash
+		}
+
+		let slides = find(this, this.slideTag);
+		let i = direction === "prev" ? slides.length - 1 : 0;
+		return slides[i].id;
+	}
+
+	select(id) {
+		document.location = `#${id}`;
 	}
 
 	sid(index) { // NB: `index` is 1-based
