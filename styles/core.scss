@@ -17,6 +17,10 @@ quay-naut {
 	display: block;
 	counter-reset: slides;
 
+	&.speaker-view {
+		overflow: hidden;
+	}
+
 	@each $height, $width in $ratios {
 		$ratio: $width / $height;
 
@@ -44,6 +48,10 @@ quay-naut {
 		height: 100%;
 		overflow: hidden;
 		border: 4px solid #808080;
+
+		.notes {
+			display: none;
+		}
 	}
 
 	&.presentation:not(.speaker-view) article {
@@ -58,15 +66,31 @@ quay-naut {
 	&.speaker-view article {
 		position: absolute;
 		transform: scale(0);
+		$scale: 0.6;
 
 		&:target,
 		&:target + article {
 			position: static;
-			transform: scale(0.6);
+			transform: scale($scale);
 			transform-origin: top left;
 		}
 		&:target + article {
-			transform: translate(60%, -90%) scale(0.4);
+			transform: translate(60%, -90%) scale(1 - $scale);
+		}
+
+		&:target {
+			overflow: visible; // required for speaker notes
+		}
+
+		&:target .notes { // XXX: hacky
+			display: block;
+			position: absolute;
+			bottom: -100%;
+			left: 0;
+			height: 100%;
+			transform: scale(calc(1 / #{$scale})); // restore original size
+			transform-origin: top left;
+			padding-top: 2em; // XXX: magic number
 		}
 
 		.quaynaut-nav a[rel=prev],

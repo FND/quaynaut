@@ -6,10 +6,12 @@ export default function render(node) {
 	tmp.innerHTML = markdown(node.textContent.trim());
 
 	let container = node.parentNode;
-	tmp.childNodes.forEach(el => {
+	let nodes = [].slice.call(tmp.childNodes);
+	nodes.forEach(el => {
 		container.insertBefore(el, node);
 	});
 	container.removeChild(node);
+	return nodes;
 }
 
 export function markdown(txt, { safe = true, smart = true } = {}) {

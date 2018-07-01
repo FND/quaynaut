@@ -1,7 +1,7 @@
 /* eslint-env browser */
 import Prism from "./prism_shim";
 import renderMarkdown from "./markdown";
-import { find } from "uitil/dom";
+import { find, replaceNode } from "uitil/dom";
 import { html2dom as html } from "uitil/dom/create";
 
 export default class Quaynaut extends HTMLElement {
@@ -15,18 +15,24 @@ export default class Quaynaut extends HTMLElement {
 			if(md.closest(slideTag)) { // XXX: inefficient
 				return;
 			}
+
 			// add slide wrapper to ensure consistent markup
 			let slide = document.createElement(slideTag);
-			md.parentNode.insertBefore(slide, md);
-			slide.appendChild(md);
-			// transfer attributes
-			let attribs = [].slice.call(md.attributes);
-			attribs.forEach(({ name, value }) => {
-				if(name === "data-markdown") { // XXX: breaks selector encapsulation
-					return;
+			wrap(md, slide);
+
+			// XXX: selector breaks encapsulation
+			transferAttributes(md, slide, { exclude: "data-markdown" });
+
+			let nodes = renderMarkdown(md);
+			// add speaker-notes wrapper to ensure consistent markup
+			let container;
+			nodes.forEach(node => {
+				if(container) {
+					container.appendChild(node);
+				} else if(node.nodeName === "HR") {
+					container = html`<div class="notes"></div>`; // XXX: hard-coded
+					replaceNode(node, container);
 				}
-				slide.setAttribute(name, value);
-				md.removeAttribute(name);
 			});
 		});
 
@@ -209,4 +215,18 @@ export default class Quaynaut extends HTMLElement {
 	get slideTag() {
 		return "article";
 	}
+}
+
+function transferAttributes(source, target, { exclude }) {
+	[].forEach.call(source.attributes, ({ name, value }) => {
+		if(name !== exclude) {
+			target.setAttribute(name, value);
+			source.removeAttribute(name);
+		}
+	});
+}
+
+function wrap(node, wrapper) {
+	node.parentNode.insertBefore(wrapper, node);
+	wrapper.appendChild(node);
 }
